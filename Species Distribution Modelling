@@ -14,13 +14,42 @@ species
 
 # plot
 plot(species)
+plot(species, pch=19) #mijenjamo tip točkica
+plot(species, pch=19, cex=0.7)
+
 
 # looking at the occurrences
 species$Occurrence
 
+pres <- species[species$Occurrence == 1,] #species presences
+pres
+class       : SpatialPointsDataFrame 
+features    : 94 
+extent      : 110112, 593393, 4013700, 4275600  (xmin, xmax, ymin, ymax)
+crs         : +proj=utm +zone=30 +datum=WGS84 +units=m +no_defs 
+variables   : 1
+names       : Occurrence 
+min values  :          1 
+max values  :          1 
+
+abse <- species[species$Occurrence == 0,] #species absences
+abse
+class       : SpatialPointsDataFrame 
+features    : 106 
+extent      : 131524, 606053, 4045400, 4226622  (xmin, xmax, ymin, ymax)
+crs         : +proj=utm +zone=30 +datum=WGS84 +units=m +no_defs 
+variables   : 1
+names       : Occurrence 
+min values  :          0 
+max values  :          0
+
+abse$Occurrnce
+plot(pres, col='blue', pch=19, cex=0.7)
+plot(abse, col='red', pch=19, cex=0.7)
+
 # copy and then write:
-plot(species[species$Occurrence == 1,],col='blue',pch=16)
-points(species[species$Occurrence == 0,],col='red',pch=16)
+plot(species[species$Occurrence == 1,],col='blue',pch=16) #napravi plot presences
+points(species[species$Occurrence == 0,],col='red',pch=16) #doda točke za absences
 
 # predictors: look at the path
 path <- system.file("external", package="sdm") 
@@ -39,6 +68,7 @@ plot(preds, col=cl)
 # plot predictors and occurrences
 plot(preds$elevation, col=cl)
 points(species[species$Occurrence == 1,], pch=16)
+#ili points(pres, pch=16)
 
 plot(preds$temperature, col=cl)
 points(species[species$Occurrence == 1,], pch=16)
@@ -54,8 +84,10 @@ points(species[species$Occurrence == 1,], pch=16)
 # set the data for the sdm
 datasdm <- sdmData(train=species, predictors=preds)
 
+library(parallel)
+
 # model
-m1 <- sdm(Occurrence ~ elevation + precipitation + temperature + vegetation, data=datasdm, methods = "glm")
+m1 <- sdm(Occurrence ~ elevation + precipitation + temperature + vegetation, data=datasdm, methods = "glm") #linear model occurrence - response variable y, 
 
 # make the raster output layer
 p1 <- predict(m1, newdata=preds) 
